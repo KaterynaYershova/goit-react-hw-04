@@ -1,13 +1,12 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
 import styles from "./SearchBar.module.css";
 import toast from "react-hot-toast";
 
-const SearchBar = ({ onSubmit }) => {
+export default function SearchBar({ onSubmit }) {
   const [query, setQuery] = useState("");
 
   const handleInputChange = (e) => {
-    setQuery(e.target.value);
+    setQuery(e.currentTarget.value);
   };
 
   const handleSubmit = (e) => {
@@ -21,27 +20,21 @@ const SearchBar = ({ onSubmit }) => {
   };
 
   return (
-    <header className={styles.SearchBar}>
-      <form onSubmit={handleSubmit} className={styles.Form}>
+    <header className={styles.searchbar}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <input
+          className={styles.input}
           type="text"
           autoComplete="off"
           autoFocus
           placeholder="Search images and photos"
           value={query}
           onChange={handleInputChange}
-          className={styles.Input}
         />
-        <button type="submit" className={styles.Button}>
+        <button type="submit" className={styles.button}>
           Search
         </button>
       </form>
     </header>
   );
-};
-
-SearchBar.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
-
-export default SearchBar;
+}

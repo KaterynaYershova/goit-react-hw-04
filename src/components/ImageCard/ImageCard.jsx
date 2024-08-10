@@ -1,17 +1,9 @@
-import PropTypes from "prop-types";
 import styles from "./ImageCard.module.css";
 
-const ImageCard = ({ src, alt }) => {
+export default function ImageCard({ imageUrl, alt, onClick }) {
   return (
-    <div className={styles.ImageCard}>
-      <img src={src} alt={alt} className={styles.Image} />
+    <div className={styles.card} onClick={onClick}>
+      <img src={imageUrl} alt={alt} className={styles.image} />
     </div>
   );
-};
-
-ImageCard.propTypes = {
-  src: PropTypes.string.isRequired,
-  alt: PropTypes.string,
-};
-
-export default ImageCard;
+}

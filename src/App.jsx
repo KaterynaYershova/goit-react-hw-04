@@ -3,59 +3,83 @@ import axios from "axios";
 import SearchBar from "./components/SearchBar/SearchBar";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
 import Loader from "./components/Loader/Loader";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
-import styles from "./App.css";
+import ImageModal from "./components/ImageModal/ImageModal";
+import toast, { Toaster } from "react-hot-toast";
 
 const API_KEY = "iL2IBrKkXie1kCKFexoV46wTUJSu2yRAQTKH9VHLcts";
+const BASE_URL = "https://api.unsplash.com/search/photos";
 
-const App = () => {
-  const [images, setImages] = useState([]);
+export default function App() {
   const [query, setQuery] = useState("");
+  const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [modalData, setModalData] = useState(null);
 
   useEffect(() => {
-    if (query === "") return;
+    if (!query) return;
 
     const fetchImages = async () => {
-      setLoading(true);
-      setError(null);
+      setIsLoading(true);
       try {
-        const response = await axios.get(
-          `https://api.unsplash.com/search/photos?query=${query}&page=${page}&client_id=${API_KEY}`
-        );
+        const response = await axios.get(BASE_URL, {
+          params: {
+            query,
+            page,
+            client_id: API_KEY,
+          },
+        });
         setImages((prevImages) => [...prevImages, ...response.data.results]);
       } catch (error) {
-        setError("Something went wrong. Please try again.");
+        setError("Something went wrong. Please try again later.");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchImages();
   }, [query, page]);
 
-  const handleSearchSubmit = (newQuery) => {
-    if (newQuery === query) return;
+  const handleSearch = (newQuery) => {
     setQuery(newQuery);
     setImages([]);
     setPage(1);
+    setError(null);
   };
 
-  const loadMore = () => {
+  const loadMoreImages = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
+  const openModal = (largeImageURL, tags) => {
+    setModalData({ largeImageURL, tags });
+  };
+
+  const closeModal = () => {
+    setModalData(null);
+  };
+
   return (
-    <div className={styles.App}>
-      <SearchBar onSubmit={handleSearchSubmit} />
-      {error && <p className={styles.ErrorMessage}>{error}</p>}
-      <ImageGallery images={images} />
-      {loading && <Loader />}
-      {images.length > 0 && !loading && <LoadMoreBtn onClick={loadMore} />}
+    <div>
+      <SearchBar onSubmit={handleSearch} />
+      <Toaster />
+      {error && <ErrorMessage message={error} />}
+      <ImageGallery images={images} onClick={openModal} />
+      {isLoading && <Loader />}
+      {images.length > 0 && !isLoading && (
+        <LoadMoreBtn onClick={loadMoreImages} />
+      )}
+      {modalData && (
+        <ImageModal
+          isOpen={!!modalData}
+          onClose={closeModal}
+          largeImageURL={modalData.largeImageURL}
+          tags={modalData.tags}
+        />
+      )}
     </div>
   );
-};
-
-export default App;
+}
