@@ -1,0 +1,17 @@
+import PropTypes from "prop-types";
+import styles from "./ImageCard.module.css";
+
+const ImageCard = ({ src, alt }) => {
+  return (
+    <div className={styles.ImageCard}>
+      <img src={src} alt={alt} className={styles.Image} />
+    </div>
+  );
+};
+
+ImageCard.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string,
+};
+
+export default ImageCard;
